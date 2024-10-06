@@ -29,11 +29,12 @@ class Issue:
         self.subtasks = subtasks
 
     def __str__(self):
-        return ' - '.join([
-            self.id,
-            self.assignee,
-            str(self.logged_time)
-        ])
+        values = [self.id, self.assignee]
+
+        if self.logged_time > 0:
+            values.append(time_str(self.logged_time))
+
+        return ' - '.join(values)
 
 
 def generate_report():
