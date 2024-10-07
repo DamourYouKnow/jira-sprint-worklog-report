@@ -29,12 +29,13 @@ class Issue:
         self.subtasks = subtasks
 
     def __str__(self):
-        values = [self.id, self.assignee]
+        values = [
+            self.id.ljust(14), 
+            time_str(self.logged_time).ljust(10),
+            self.summary
+        ]
 
-        if self.logged_time > 0:
-            values.append(time_str(self.logged_time))
-
-        return ' - '.join(values)
+        return ''.join(values)
 
 
 def generate_report():
@@ -61,6 +62,15 @@ def generate_report():
         report[issue.assignee].issues.append(issue)
 
     output = format_report(report)
+    output_short = format_report(report, expand=False)
+
+    print(output)
+
+    with open('./reports/report.txt', 'w') as file:
+        file.write(output)
+
+    with open('./reports/report-short.txt', 'w') as file:
+        file.write(output_short)
 
 
 def create_issue(item):
@@ -80,18 +90,19 @@ def create_issue(item):
     )
 
 
-def format_report(report):
+def format_report(report, expand=True):
     output = []
     
     for member in report.values():
         output.append(f'{member.name} - {time_str(member.total_logged_time())}')
-
+        if not expand:
+            continue
+    
         for issue in member.issues:
             output.append(str(issue))
 
         output.append('')
     
-    print('\n'.join(output))
     return '\n'.join(output)
 
 
